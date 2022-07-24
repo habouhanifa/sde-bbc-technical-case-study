@@ -1,1 +1,1 @@
-# sde-bbc-technical-case-study
+# Senior-DE-BBC-technical-case-study
