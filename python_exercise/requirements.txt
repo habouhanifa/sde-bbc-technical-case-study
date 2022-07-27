@@ -1,0 +1,6 @@
+PyYAML
+great-expectations
+google-cloud-storage==2.4.0
+apache-airflow[postgres]==2.3.3
+apache-airflow-providers-http
+pytest

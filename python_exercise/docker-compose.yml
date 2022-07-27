@@ -50,18 +50,23 @@ x-airflow-common:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    PYTHONPATH: "${PYTHONPATH}:/opt/airflow/libraries"
     # For backward compatibility, with Airflow <2.3
     AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://airflow:airflow@postgres/airflow
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
-    AIRFLOW__CORE__LOAD_EXAMPLES: 'true'
+    AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
     _PIP_ADDITIONAL_REQUIREMENTS: ${_PIP_ADDITIONAL_REQUIREMENTS:-}
+    # CONNECTIONS
+    AIRFLOW_CONN_OVAPI_NL: http://v0.ovapi.nl/
   volumes:
-    - .src/dags:/opt/airflow/dags
-    - ./plugins:/opt/airflow/plugins
+    - ./src/dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - ./src/plugins:/opt/airflow/plugins
+    - ./src/libraries:/opt/airflow/libraries
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on
@@ -98,7 +103,8 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
-    command: webserver
+    command:
+     - webserver
     ports:
       - 8080:8080
     healthcheck:

@@ -1,0 +1,20 @@
+logging:
+  name: PYTHON_EXERCISE
+  level: 10
+
+gcs:
+  bucket-name: ovapi-nl-data
+  prefixes:
+    raw: 01_RAW
+    staging: 02_STAGING
+    clean: 03_CLEAN
+    rejected: 04_REJECTED
+
+api:
+  base-url: http://v0.ovapi.nl/
+  endpoint: line/
+
+file:
+  parent-folder: output
+  name: ovapi_raw_data
+  extension: .json
