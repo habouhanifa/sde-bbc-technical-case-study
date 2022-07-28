@@ -1,0 +1,71 @@
+{
+  "data_asset_type": null,
+  "expectation_suite_name": "ovapi_nl",
+  "expectations": [
+    {
+      "expectation_type": "expect_table_columns_to_match_set",
+      "kwargs": {
+        "column_set": [
+            "Line",
+            "LineWheelchairAccessible",
+            "TransportType",
+            "DestinationName50",
+            "DataOwnerCode",
+            "DestinationCode",
+            "LinePublicNumber",
+            "LinePlanningNumber",
+            "LineName",
+            "LineDirection"
+        ],
+          "exact_match": false
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "Line"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "DataOwnerCode"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "LinePlanningNumber"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_values_to_not_be_null",
+      "kwargs": {
+        "column": "LineDirection"
+      },
+      "meta": {}
+    },
+    {
+      "expectation_type": "expect_column_distinct_values_to_be_in_set",
+      "kwargs": {
+        "column": "TransportType",
+        "value_set": [
+                  "BUS",
+                  "TRAIN",
+                  "METRO",
+                  "TRAM",
+                  "BOAT"
+                ]
+      },
+      "meta": {}
+    }
+  ],
+  "ge_cloud_id": null,
+  "meta": {
+    "great_expectations_version": "0.15.15"
+  }
+}

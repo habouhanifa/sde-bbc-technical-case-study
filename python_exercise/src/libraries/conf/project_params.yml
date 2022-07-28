@@ -2,12 +2,20 @@ logging:
   name: PYTHON_EXERCISE
   level: 10
 
+great-expectations:
+    datasource-name: ovapi_nl_lines
+    data-docs:
+        identifier: OVAPI NL Lines Data Validation
+        output: output/data_validation/data_docs/
+    validations:
+        output: output/data_validation/validations/
+
 gcs:
-  bucket-name: ovapi-nl-data
+  bucket-name: ovapi_nl_data_public
   prefixes:
     raw: 01_RAW
     staging: 02_STAGING
-    clean: 03_CLEAN
+    ready: 03_READY
     rejected: 04_REJECTED
 
 api:

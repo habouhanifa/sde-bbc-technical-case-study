@@ -27,7 +27,7 @@ To setup the development environment execute the `ìnstall.sh` script
 This will create a python 3.7 virtual environment with all the modules needed for the development of the project.
 
 ### (Optional) Creating Schema and table in BigQuery
->> This step is not necessary for the demo as the objects are already created 
+> This step is not necessary for the demo as the objects are already created 
 
 To create the schemas and the target table needed for the project, you can run the following script:
 
@@ -68,6 +68,10 @@ You now have access to the data in bigquery tables:
 - `bbc_case_study_staging.ext_ovapi_nl_lines`: external table pointing to the latest validated file in GCS bucket
 - `bbc_case_study.ovapi_nl_lines`: target table with data from the OVAPI Netherlands Per Line endpoint
 
+> To reset the table `bbc_case_study.ovapi_nl_lines`, execute the script `reset_tables.sh`
+>```
+>./reset_tables.sh
+>```
 
 ### Pipeline explanation:
 

@@ -1,0 +1,93 @@
+{
+    "data_context": {
+        "config_version": 1,
+        "datasources": {
+            "ovapi_nl_lines": {
+                "class_name": "Datasource",
+                "module_name": "great_expectations.datasource",
+                "execution_engine": {
+                    "module_name": "great_expectations.execution_engine",
+                    "class_name": "PandasExecutionEngine"
+                },
+                "data_connectors": {
+                    "runtime_data_connector": {
+                        "class_name": "RuntimeDataConnector",
+                        "module_name": "great_expectations.datasource.data_connector",
+                        "batch_identifiers": [
+                            "source"
+                        ]
+                    }
+                }
+            }
+        },
+        "expectations_store_name": "expectations_store",
+        "validations_store_name": "validations_store",
+        "checkpoint_store_name": "checkpoint_store",
+        "evaluation_parameter_store_name": "evaluation_parameter_store",
+        "stores": {
+            "evaluation_parameter_store": {
+                "class_name": "EvaluationParameterStore"
+            },
+            "expectations_store": {
+                "class_name": "ExpectationsStore",
+                "store_backend": {
+                    "class_name": "TupleFilesystemStoreBackend",
+                    "base_directory": "${EXPECTATIONS_STORE}"
+                }
+            },
+            "checkpoint_store": {
+                "class_name": "CheckpointStore",
+                "store_backend": {
+                    "class_name": "TupleFilesystemStoreBackend",
+                    "base_directory": "${CHECKPOINT_STORE}",
+                    "filepath_suffix": ".json"
+                }
+            },
+            "validations_store": {
+                "class_name": "ValidationsStore",
+                "store_backend": {
+                    "class_name": "TupleFilesystemStoreBackend",
+                    "base_directory": "${VALIDATIONS_STORE}"
+                }
+            }
+        },
+        "validation_operators":{
+          "action_list_operator": {
+              "class_name": "ActionListValidationOperator",
+              "action_list": [
+                  {
+                      "name": "store_validation_result",
+                      "action": {
+                          "class_name": "StoreValidationResultAction"
+                      }
+                  },
+                  {
+                      "name": "store_evaluation_params",
+                      "action": {
+                          "class_name": "StoreEvaluationParametersAction"
+                      }
+                  },
+                  {
+                      "name": "update_data_docs",
+                      "action": {
+                          "class_name": "UpdateDataDocsAction"
+                      }
+                  }
+              ]
+            }
+        },
+        "plugins_directory": "${PLUGINS_DIRECTORY}",
+        "data_docs_sites": {
+            "OVAPI NL Lines Data Validation": {
+                "class_name": "SiteBuilder",
+                "store_backend": {
+                    "class_name": "TupleFilesystemStoreBackend",
+                    "base_directory": "${DOCS_LOCAL_DIR}"
+                },
+                "site_index_builder": {
+                    "class_name": "DefaultSiteIndexBuilder"
+                }
+            }
+        }
+    }
+}

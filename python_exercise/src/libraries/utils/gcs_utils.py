@@ -21,5 +21,5 @@ class GCSHelper(Loggable):
         bucket = self.storage_client.get_bucket(self.bucket_name)
         blob = bucket.blob(blob_name)
         blob.upload_from_filename(local_file_path)
-        self.logger.info(f"{local_file_path} uploaded to {self.bucket_name}.")
+        self.logger.info(f"{local_file_path} uploaded to {self.bucket_name}/{blob_name}")
         return blob.public_url

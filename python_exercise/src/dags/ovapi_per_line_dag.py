@@ -1,13 +1,14 @@
-import os
-
-from airflow import DAG
-from airflow.operators.python import PythonOperator
-from airflow.providers.http.sensors.http import HttpSensor
-
 from datetime import datetime, timedelta
 
-from libraries.processing.job import Extractor
+from airflow import DAG
+from airflow.operators.empty import EmptyOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQueryOperator
+from airflow.operators.python import PythonOperator, BranchPythonOperator
+from airflow.providers.http.sensors.http import HttpSensor
+
+from libraries.processing.jobs import Extractor, Validator
 from libraries.utils.utils import ConfLoader
+from libraries.sql import SQL_FOLDER
 
 default_args = {
     'start_date': datetime(2022, 7, 24),
@@ -16,17 +17,31 @@ default_args = {
 }
 
 ENDPOINT = ConfLoader.load_conf('api')['endpoint']
+BUCKET_NAME = ConfLoader.load_conf('gcs')['bucket-name']
 
 
-def fn_upload_data_to_gcs():
+def fn_upload_data_to_gcs(ti):
     job = Extractor()
-    job.run()
+    staged_file = job.run()
+    ti.xcom_push(key='staged_file', value=staged_file)
+
+
+def fn_run_data_validation(ti):
+    staged_file = ti.xcom_pull(key='staged_file', task_ids=['upload_data_to_gcs'])[0].strip()
+    job = Validator(staged_file)
+    is_successful = job.run()
+    if is_successful:
+        return "create_external_table"
+    else:
+        return "end"
 
 
 with DAG(dag_id='ovapi_per_line_dag',
          schedule_interval='@daily',
          default_args=default_args,
-         catchup=False) as dag:
+         catchup=False,
+         template_searchpath=f'{SQL_FOLDER}/') as dag:
+    start = EmptyOperator(task_id='start')
     check_if_api_available = HttpSensor(task_id='check_if_api_available',
                                         http_conn_id='OVAPI_NL',
                                         endpoint=ENDPOINT,
@@ -38,4 +53,22 @@ with DAG(dag_id='ovapi_per_line_dag',
     upload_data_to_gcs = PythonOperator(task_id='upload_data_to_gcs',
                                         python_callable=fn_upload_data_to_gcs)
 
-    check_if_api_available >> upload_data_to_gcs
+    run_data_validation = BranchPythonOperator(task_id='run_data_validation',
+                                               python_callable=fn_run_data_validation,
+                                               do_xcom_push=False)
+
+    create_external_table = BigQueryExecuteQueryOperator(task_id='create_external_table',
+                                                         sql='ddl/EXT_OVAPI_NL_LINES.sql',
+                                                         use_legacy_sql=False)
+
+    load_data_to_target_table = BigQueryExecuteQueryOperator(task_id='load_data_to_target_table',
+                                                             sql='dml/OVAPI_NL_LINES.sql',
+                                                             use_legacy_sql=False)
+
+    end = EmptyOperator(task_id='end')
+
+    start >> check_if_api_available
+    check_if_api_available >> upload_data_to_gcs >> run_data_validation
+    run_data_validation >> create_external_table >> load_data_to_target_table
+    run_data_validation >> end
+    load_data_to_target_table >> end

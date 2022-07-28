@@ -1,30 +1,23 @@
 import json
-import shutil
 
 import pandas as pd
 import requests
-import os
-from datetime import datetime as dt
 
-from libraries.utils.gcs_utils import GCSHelper
-from libraries.utils.utils import ConfLoader, Loggable
+from libraries.utils.great_expectation_utils import GreatExpectationConfiguration
+from libraries.utils.job import Job
+from libraries.utils.utils import ConfLoader
 
 
-class Extractor(Loggable):
+class Extractor(Job):
     """
     Class for extracting data from the public API for “Transport for The Netherlands” which provides information about OVAPI, country-wide public transport
     """
 
     def __init__(self):
         super().__init__()
-        self.gcs_helper = GCSHelper()
         api_params = ConfLoader.load_conf('api')
-        file_params = ConfLoader.load_conf('file')
         self.url = f"{api_params['base-url']}{api_params['endpoint']}"
-        self.file_name = file_params['name']
-        self.extension = file_params['extension']
-        self.parent_folder = file_params['parent-folder']
-        self.processing_time = dt.strftime(dt.utcnow(), '%Y%m%d')
+
 
     def extract_data_from_api(self):
         """
@@ -54,17 +47,6 @@ class Extractor(Loggable):
         self.logger.info(f"Data downloaded to {output_file_path}")
         return output_file
 
-    def load_to_gcs(self, local_file, prefix):
-        """
-        Loads the temporary file with API data to a Google Cloud Storage bucket and then deletes the temp folder
-        :param prefix: The prefix of the blob to store in the bucket
-        :param local_file: temporary file downloded from the API Call
-        :return:
-        """
-        local_file_path = f'{self.parent_folder}/{local_file}'
-        self.gcs_helper.upload_blob_to_gcs_bucket(f'{prefix}/{local_file}', local_file_path)
-        #shutil.rmtree(self.parent_folder)
-
     def raw_data_to_staging(self, raw_data):
         """
 
@@ -88,22 +70,31 @@ class Extractor(Loggable):
         staged_file = self.raw_data_to_staging(raw_data)
         prefix_staging = self.gcs_helper.prefixes['staging']
         self.load_to_gcs(staged_file, prefix_staging)
+        return staged_file
 
-    def _create_temp_folder(self):
-        if not os.path.exists(self.parent_folder):
-            os.mkdir(self.parent_folder)
+class Validator(Job):
+    """ Class for validating data using great expectation tool (verifying conditions on columns)
+    :attribute staged_file: file to validate
+    """
 
-
-class Loader(Loggable):
-    def __init__(self):
+    def __init__(self, staged_file: str):
         super().__init__()
+        self.staged_file = staged_file
+        self.ge_conf = GreatExpectationConfiguration()
 
-
-class Transformer(Loggable):
-    def __init__(self):
-        super().__init__()
-
+    def run(self):
+        staged_file_path = f'{self.parent_folder}/{self.staged_file}'
+        result = self.ge_conf.run_expectations(staged_file_path)
+        if result['success']:
+            prefix_ready = self.gcs_helper.prefixes['ready']
+            self.load_to_gcs(self.staged_file, prefix_ready)
+        else:
+            prefix_rejected = self.gcs_helper.prefixes['rejected']
+            self.load_to_gcs(self.staged_file, prefix_rejected)
+        return result['success']
 
 if __name__ == '__main__':
-    extractor = Extractor()
-    extractor.run()
+    v = Validator('ovapi_raw_data_20220727.csv')
+    result = v.run()
+    print(result)
+
