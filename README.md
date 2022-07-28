@@ -4,6 +4,7 @@
 ### Pre-requisits:
 
 This mini project uses Airflow 2.3 using the Celery executor, each airflow instance runs on a docker container.
+
 The tools needed to execute the project.
 - Docker
 - Python>=3.7
@@ -16,6 +17,58 @@ First, clone the repository from GitHub:
 git clone https://github.com/habouhanifa/sde-bbc-technical-case-study.git
 ```
 
+### Repository structure:
+ ```
+├── README.md
+└── modeling_exercise # Model for the second exercise
+└── python_exercise # Code for the first exercise
+    ├── __init__.py
+    ├── src 
+    │   ├── __init__.py
+    │   ├── dags # dag folder
+    │   │   ├── __init__.py
+    │   │   └── ovapi_per_line_dag.py
+    │   ├── libraries 
+    │   │   ├── __init__.py
+    │   │   ├── conf
+    │   │   │   ├── __init__.py
+    │   │   │   ├── checkpoints 
+    │   │   │   │   └── ovapi_nl_lines_checkpoint.json # Checkpoint is an entrypoint to run a great expection suite
+    │   │   │   ├── credentials.json # credentials files to access GCS and BigQuery
+    │   │   │   ├── expectations
+    │   │   │   │   └── ovapi_nl_lines.json # File listing the expectations(Data Quality rules) for validating input data
+    │   │   │   ├── great_expectations.json # Configuration file for great expectations to setup the data context
+    │   │   │   ├── plugins
+    │   │   │   │   └── custom_data_docs
+    │   │   │   └── project_params.yml # Configuration file with parameters needed for the project
+    │   │   ├── processing
+    │   │   │   ├── __init__.py
+    │   │   │   ├── jobs.py # module containing 
+    │   │   ├── sql
+    │   │   │   ├── __init__.py
+    │   │   │   ├── ddl
+    │   │   │   │   ├── EXT_OVAPI_NL_LINES.sql # DDL for creating external table pointing to the latest validated file
+    │   │   │   │   ├── OVAPI_NL_LINES.sql # DDL for creating the target table
+    │   │   │   │   ├── create_schema.sql # DDL for creating schemas 
+    │   │   │   │   └── reset_tables.sql # DDL for recreating the target table
+    │   │   │   └── dml
+    │   │   │       └── OVAPI_NL_LINES.sql # script for the upsert of data to the target table
+    │   │   └── utils
+    │   │       ├── __init__.py
+    │   │       ├── exceptions.py
+    │   │       ├── gcs_utils.py # utils module to interact with GCS
+    │   │       ├── great_expectation_utils.py # utils module to configure great expectations and run data quality
+    │   │       ├── job.py
+    │   └──     └── utils.py 
+    ├── install.sh # install python virtual environment 
+    ├── requirements.txt
+    ├── reset_tables.sh # script to run sql for recreation of target table
+    ├── run.sh # wrapper script to run docker compose
+    ├── run_ddl.sh # script to run sql for creating schemas and tables
+    ├── docker-compose.yml
+    └── stop.sh # Stop the running containers
+```
+ 
 ### Setting-up the development environment
  
 To setup the development environment execute the `ìnstall.sh` script
@@ -45,7 +98,7 @@ The project components are all dockerized, and in order to start the project, we
 
 This will execute a `docker-compose up` to start the different Docker containers.
 
-### Run Demo:
+### Run Demo
 
 Once all the containers are up, trigger the dag `ovapi_per_line_dag` to run the data pipeline.
 To check the output of the pipeline, the ressources have been made public:
@@ -73,7 +126,7 @@ You now have access to the data in bigquery tables:
 >./reset_tables.sh
 >```
 
-### Pipeline explanation:
+### Pipeline explanation
 
 The pipeline `ovapi_per_line_dag` is composed of 5 main tasks.
 

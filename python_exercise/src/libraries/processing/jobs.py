@@ -1,4 +1,5 @@
 import json
+import shutil
 
 import pandas as pd
 import requests
@@ -10,14 +11,14 @@ from libraries.utils.utils import ConfLoader
 
 class Extractor(Job):
     """
-    Class for extracting data from the public API for “Transport for The Netherlands” which provides information about OVAPI, country-wide public transport
+    Class for extracting data from the public API for “Transport for The Netherlands” which provides information about
+    OVAPI, country-wide public transport
     """
 
     def __init__(self):
         super().__init__()
         api_params = ConfLoader.load_conf('api')
         self.url = f"{api_params['base-url']}{api_params['endpoint']}"
-
 
     def extract_data_from_api(self):
         """
@@ -72,6 +73,7 @@ class Extractor(Job):
         self.load_to_gcs(staged_file, prefix_staging)
         return staged_file
 
+
 class Validator(Job):
     """ Class for validating data using great expectation tool (verifying conditions on columns)
     :attribute staged_file: file to validate
@@ -93,8 +95,21 @@ class Validator(Job):
             self.load_to_gcs(self.staged_file, prefix_rejected)
         return result['success']
 
-if __name__ == '__main__':
-    v = Validator('ovapi_raw_data_20220727.csv')
-    result = v.run()
-    print(result)
 
+class Cleaner(Job):
+    """
+    Class used for cleaning the temporary folders
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def clean_temporary_files(self):
+        """
+        Deletes the temporary folder with temporary files created from the python jobs
+        :return:
+        """
+        shutil.rmtree(self.parent_folder)
+
+    def run(self):
+        self.clean_temporary_files()
