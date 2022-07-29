@@ -141,3 +141,6 @@ If the file fails those expectations it will be uploded to the GCS bucket under 
 - `create_external_table`: Creates an external table pointing to the latest file with prefix 03_READY in the GCS bucket
 - `load_data_to_target_table`: Executes a SQL query to upsert data in the external table to the target table
  
+## Modeling Exercise
+
+See [modeling_exercise/trip_offer.md](modeling_exercise/trip_offer.md)

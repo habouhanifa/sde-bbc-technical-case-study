@@ -70,13 +70,13 @@ with DAG(dag_id='ovapi_per_line_dag',
                                                              sql='dml/OVAPI_NL_LINES.sql',
                                                              use_legacy_sql=False)
 
-    clean_temporay_folder = PythonOperator(task_id='clean_temporay_folders',
-                                           python_callable=fn_clean_temporay_folders)
+    clean_temporary_folder = PythonOperator(task_id='clean_temporary_folders',
+                                            python_callable=fn_clean_temporay_folders)
 
     end = EmptyOperator(task_id='end')
 
     start >> check_if_api_available
     check_if_api_available >> upload_data_to_gcs >> run_data_validation
     run_data_validation >> create_external_table >> load_data_to_target_table
-    run_data_validation >> end
-    load_data_to_target_table >> end
+    run_data_validation >> clean_temporary_folder >> end
+    load_data_to_target_table >> clean_temporary_folder >> end
