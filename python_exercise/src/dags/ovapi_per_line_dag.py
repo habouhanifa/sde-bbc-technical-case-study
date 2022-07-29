@@ -6,7 +6,7 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryExecuteQue
 from airflow.operators.python import PythonOperator, BranchPythonOperator
 from airflow.providers.http.sensors.http import HttpSensor
 
-from libraries.processing.jobs import Extractor, Validator
+from libraries.processing.jobs import Extractor, Validator, Cleaner
 from libraries.utils.utils import ConfLoader
 from libraries.sql import SQL_FOLDER
 
@@ -34,6 +34,11 @@ def fn_run_data_validation(ti):
         return "create_external_table"
     else:
         return "end"
+
+
+def fn_clean_temporay_folders():
+    job = Cleaner()
+    job.run()
 
 
 with DAG(dag_id='ovapi_per_line_dag',
@@ -64,6 +69,9 @@ with DAG(dag_id='ovapi_per_line_dag',
     load_data_to_target_table = BigQueryExecuteQueryOperator(task_id='load_data_to_target_table',
                                                              sql='dml/OVAPI_NL_LINES.sql',
                                                              use_legacy_sql=False)
+
+    clean_temporay_folder = PythonOperator(task_id='clean_temporay_folders',
+                                           python_callable=fn_clean_temporay_folders)
 
     end = EmptyOperator(task_id='end')
 

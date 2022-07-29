@@ -46,9 +46,3 @@ class Job(Loggable, ABC):
         if not os.path.exists(self.parent_folder):
             os.mkdir(self.parent_folder)
 
-    def clean_temporary_files(self):
-        """
-        Deletes the temporary folder with temporary files created from the python jobs
-        :return:
-        """
-        shutil.rmtree(self.parent_folder)
