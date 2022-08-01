@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 
 import pandas as pd
@@ -109,7 +110,8 @@ class Cleaner(Job):
         Deletes the temporary folder with temporary files created from the python jobs
         :return:
         """
-        shutil.rmtree(self.parent_folder)
+        if os.path.exists(self.parent_folder):
+            shutil.rmtree(self.parent_folder)
 
     def run(self):
         self.clean_temporary_files()
