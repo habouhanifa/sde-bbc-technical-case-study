@@ -8,8 +8,8 @@ For This reason, we create the `Member` table :
 - `last_name`: Last name of the member
 - `email`:  Email of the member
 - `phone_number`: Phone number of the member
-- `is_email_verified`: 1 if the email is verified else 0
-- `is_phone_verified`: 1 if the phone is verified else 0
+- `is_email_confirmed`: 1 if the email is verified else 0
+- `is_phone_condfirmed`: 1 if the phone is verified else 0
 
 ## City
 
@@ -67,12 +67,12 @@ The trip could have multiple additional stops, we will store them on a table of 
 - `trip_id`: (FK) Identifier of the trip (Refrences `Trip` table)
 - `stop_id`: (FK) Identifier of the stop point (Refrences `Stops` table)
 
-## Request
+## Member Request
 Once a trip is published, other users could request to join, and choose one of the stops published by 
 the driver as their starting point or destination, the sub-trip would have a prorated price, and the driver could 
 accept/reject their request.
 
-A table `Request` stores these details:
+A table `member_request` stores these details:
 - `request_id`: (PK) Identifier of the request
 - `member_id`: (FK) Identifier of the member (Refrences `Member` table)
 - `trip_id`: (FK) Identifier of the trip (Refrences `Trip` table)

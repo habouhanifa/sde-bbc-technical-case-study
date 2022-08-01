@@ -131,4 +131,7 @@ dmypy.json
 # great expectations
 **/.ge_store_backend_id
 
+# pycharm
+.idea/
+
 /python_exercise/logs/

@@ -143,4 +143,4 @@ If the file fails those expectations it will be uploded to the GCS bucket under 
  
 ## Modeling Exercise
 
-See [modeling_exercise/trip_offer.md](modeling_exercise/trip_offer.md)
+See [modeling_exercise/data_model.md](modeling_exercise/data_model.md)
