@@ -3,7 +3,7 @@
 ## Python Exercise
 ### Pre-requisits:
 
-This mini project uses Airflow 2.3 using the Celery executor, each airflow instance runs on a docker container.
+This mini project uses Airflow 2.3 using the Celery executor, each airflow component runs on a docker container.
 
 The tools needed to execute the project.
 - Docker
