@@ -33,7 +33,7 @@ git clone https://github.com/habouhanifa/sde-bbc-technical-case-study.git
     │   │   ├── conf
     │   │   │   ├── __init__.py
     │   │   │   ├── checkpoints 
-    │   │   │   │   └── ovapi_nl_lines_checkpoint.json # Checkpoint is an entrypoint to run a great expection suite
+    │   │   │   │   └── ovapi_nl_lines_checkpoint.json # Checkpoint is an entrypoint to run a great expectation suite
     │   │   │   ├── credentials.json # credentials files to access GCS and BigQuery
     │   │   │   ├── expectations
     │   │   │   │   └── ovapi_nl_lines.json # File listing the expectations(Data Quality rules) for validating input data
